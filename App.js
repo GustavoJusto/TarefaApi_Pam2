@@ -1,14 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {Component} from 'react';
+import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import api from './components/Api';
+import Cep from './components/Cep';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+class App extends Component {
+
+  constructor(props){
+    super(props);
+    this.state ={
+      cep:[],
+      cepDigitado: ''
+    };
+    this.carregar = this.carregar.bind(this);
+  }
+
+  async componentDidMount(){
+    const response = await api.get('t=');
+    this.setState({
+      cep: response.data
+    })
+  }
+
+  async carregar(){
+    const response = await api.get('t='+this.state.cepDigitado);
+    this.setState({
+      cep: response.data
+      
+    })
+  }
+
+  render(){
+    return (
+      <View style={styles.container}>
+        <TextInput 
+          placeholder="Digite Seu Cep..." 
+          onChangeText={
+            (value) => this.setState({cepDigitado: value})
+          }/>
+        <Cep data={this.state.cep}/>
+        <Button title="Buscar" onPress={this.carregar}/>
+      </View>
+    );
+  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -19,3 +53,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default App;
